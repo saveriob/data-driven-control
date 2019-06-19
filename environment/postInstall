@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -e
+
+echo 'Download YALMIP'
+YALMIP_RELEASE=R20190425
+curl -sL https://github.com/yalmip/YALMIP/archive/$YALMIP_RELEASE.tar.gz | tar xz
+mv YALMIP-$YALMIP_RELEASE YALMIP
+
+echo 'Download Matpower'
+git clone --branch 7.0b1 https://github.com/MATPOWER/matpower.git
+ 
+matlab -nodisplay -r "\
+ disp('Install YALMIP');\
+ addpath(genpath('/YALMIP'));\
+ disp('Install tbxmanager');\
+ mkdir('/tbxmanager');\
+ cd('/tbxmanager');\
+ urlwrite('http://www.tbxmanager.com/tbxmanager.m', 'tbxmanager.m');\
+ a=evalc('tbxmanager');\
+ disp('Install MPT3');\
+ evalc('tbxmanager install mpt mptdoc cddmex fourier glpkmex hysdel lcp sedumi espresso');\
+ evalc('mpt_init');\
+ savepath;\
+ disp('Install Matpower');\
+ cd('/matpower');\
+ install_matpower(1,1);\
+ disp('Done');"
